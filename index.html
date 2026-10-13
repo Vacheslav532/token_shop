@@ -18,45 +18,54 @@
   .card {
     background: var(--tg-theme-secondary-bg-color, #f1f1f1);
     border-radius: 14px;
-    padding: 16px;
+    padding: 20px;
     margin-bottom: 12px;
+    text-align: center;
   }
   .price {
-    font-size: 22px;
-    font-weight: bold;
-    color: var(--tg-theme-button-color, #2AABEE);
+    font-size: 18px;
+    margin: 10px 0;
+    opacity: 0.8;
   }
   .btn {
     display: block;
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     font-size: 16px;
     border: none;
     border-radius: 10px;
     background: var(--tg-theme-button-color, #2AABEE);
     color: var(--tg-theme-button-text-color, #fff);
     cursor: pointer;
-    margin-top: 10px;
   }
   .btn:active { opacity: 0.8; }
+  input {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    border: 2px solid var(--tg-theme-button-color, #2AABEE);
+    border-radius: 10px;
+    background: var(--tg-theme-bg-color, #fff);
+    color: var(--tg-theme-text-color, #000);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .hint {
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+  }
 </style>
 </head>
 <body>
   <h2>🛍 Купить токены</h2>
+  <div class="hint">💰 Курс: 1 токен = 1 ⭐</div>
+
   <div class="card">
-    <div>1 токен</div>
-    <div class="price">15 ₽</div>
-    <button class="btn" onclick="buy(1)">Купить</button>
-  </div>
-  <div class="card">
-    <div>5 токенов</div>
-    <div class="price">75 ₽</div>
-    <button class="btn" onclick="buy(5)">Купить</button>
-  </div>
-  <div class="card">
-    <div>10 токенов</div>
-    <div class="price">150 ₽</div>
-    <button class="btn" onclick="buy(10)">Купить</button>
+    <input type="number" id="amount" placeholder="Сколько токенов?" min="1" max="10000">
+    <div class="price">Итого: <b><span id="total">0</span> ⭐</b></div>
+    <button class="btn" onclick="buy()">Купить</button>
   </div>
 
   <script>
@@ -64,7 +73,24 @@
     tg.ready();
     tg.expand();
 
-    function buy(tokens) {
+    const input = document.getElementById("amount");
+    const total = document.getElementById("total");
+
+    input.addEventListener("input", () => {
+      const n = parseInt(input.value) || 0;
+      total.innerText = n;
+    });
+
+    function buy() {
+      const tokens = parseInt(input.value) || 0;
+      if (tokens < 1) {
+        tg.showAlert("Введи число больше 0");
+        return;
+      }
+      if (tokens > 10000) {
+        tg.showAlert("Максимум 10000 токенов");
+        return;
+      }
       tg.sendData(JSON.stringify({
         action: "buy_tokens",
         tokens: tokens
